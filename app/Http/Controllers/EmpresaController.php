@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Player;
+use App\Empresa;
 use App\Http\Resources\Empresa as EmpresaResource;
 use App\Http\Resources\EmpresaCollection;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use Illuminate\Http\Request;
 
@@ -12,23 +15,33 @@ class EmpresaController extends Controller
 {
     public function index()
     {
-        return new PlayerCollection(Player::all());
+        return new EmpresaCollection(Empresa::all());
     }
 
     public function show($id)
     {
-        return new PlayerResource(Player::findOrFail($id));
+        return new EmpresaResource(Player::findOrFail($id));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|max:255',
+
+            'cargo' => 'accepted',
+            'email' => 'email',
+            'token' => 'token',
+            'status' => 'status',
+
+
+
+
+
+
         ]);
 
-        $player = Player::create($request->all());
+        $empresa = Empresa::create($request->all());
 
-        return (new PlayerResource($player))
+        return (new EmpresaResource($empresa))
                 ->response()
                 ->setStatusCode(201);
     }
@@ -40,22 +53,30 @@ class EmpresaController extends Controller
             'correct' => 'required|boolean'
         ]);
 
-        $player = Player::findOrFail($id);
-        $player->answers++;
-        $player->points = ($request->get('correct')
-                           ? $player->points + 1
-                           : $player->points - 1);
-        $player->save();
+        $empresa = Empresa::findOrFail($id);
+        $empresa->answers++;
+        $empresa->points = ($request->get('correct')
+                           ? $empresa->points + 1
+                           : $empresa->points - 1);
+        $empresa->save();
 
-        return new PlayerResource($player);
+        return new EmpresaResource($empresa);
     }
 
     public function delete($id)
     {
-        $player = Player::findOrFail($id);
-        $player->delete();
 
-        return response()->json(null, 204);
+        try {
+            $empresa = Empresa::findOrFail($id);
+            //dd($empresa);
+
+            $empresa->delete();
+            return response()->json("Deletado com Sucesso!", 200);
+        } catch (ModelNotFoundException $e) {
+            //dd($e);
+            //$empresa->delete();
+            return response()->json("Erro ao Deletar!", 400);
+        }
     }
 
     public function resetAnswers($id)
