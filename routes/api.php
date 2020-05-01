@@ -17,3 +17,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+Route::get('/empresas-cadastro', 'EmpresaController@index');
+Route::get('/empresas-cadastro/{id}', 'EmpresaController@show');
+Route::post('/empresas-cadastro', 'EmpresaController@store');
+Route::post('/empresas-cadastro/{id}/answers', 'EmpresaController@answer');
+Route::delete('/empresas-cadastro/{id}', 'EmpresaController@delete');
+Route::delete('/empresas-cadastro/{id}/answers', 'EmpresaController@resetAnswers');
